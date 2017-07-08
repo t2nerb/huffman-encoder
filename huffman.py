@@ -5,8 +5,6 @@ import argparse
 import pickle
 import os
 
-verbose = False
-
 class Node(object):
     """
     Object representing a node with left and right children.
@@ -31,11 +29,11 @@ class PriorityQ(object):
         for i in range(self.length):
             if item[0] <= self.list[i][0]:
                 self.list.insert(i, item)
-                if (verbose): print('inserted: ', item, ' at index', i)
+                if (args.verbose): print('inserted: ', item, ' at index', i)
                 self.length += 1
                 return
         self.list.append(item)
-        if (verbose): print('appended: ', item, ' at index ', len(self.list)-1)
+        if (args.verbose): print('appended: ', item, ' at index ', len(self.list)-1)
         self.length += 1
 
     def deletemin(self):
@@ -83,14 +81,8 @@ def string2freq(x):
     """
     lettercounts = {}
     for ch in x:
-
-        # if ch exists as key in lettercounts, increment by 1
         if ch in lettercounts: lettercounts[ch] += 1
-
-        # if ch doesn't exist as key in lettercounts, initilize key as 1
         else: lettercounts[ch] = 1
-
-    # return list of tuples in format (frequency, character)
     return [(lettercounts[y], y) for y in lettercounts]
 
 def encodeString(x, t):
@@ -145,14 +137,8 @@ def huffmanEncode(lc):
 
     # Loop until all nodes have been merged into a root node
     while priority_q.length > 1:
-
-        # get two smallest elements in our priority queue
         i, j = priority_q.deletemin(), priority_q.deletemin()
-
-        # merge two smallest elements into single node
         new_node = Node(i, j)
-
-        # add our new node and the total freq count into priority queue
         priority_q.insert((i[0]+j[0], new_node))
 
     # get root node
@@ -166,12 +152,15 @@ def huffmanEncode(lc):
 
 if __name__ == "__main__":
 
+    global args
     argparser = argparse.ArgumentParser(prog="./huffman.py")
     argparser.add_argument("-d", "--decode", action="store_true",
                            help="Decrypt a file", default=False)
     argparser.add_argument("file_path", metavar="file_path", 
                            help="Path to file to encrypt/decrypt", 
                            type=str) 
+    argparser.add_argument("-v", "--verbose", action="store_true", 
+                           help="Print debugging statements", default=False)
     args = argparser.parse_args()
 
     if (args.decode):

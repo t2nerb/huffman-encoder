@@ -1,12 +1,15 @@
 #!/usr/local/bin/python3
 from math import log as lg
+import sys
+import argparse
+import pickle
+import os
 
-# For debugging, set to true to see all prints, otherwise set to false
 verbose = False
 
 class Node(object):
     """
-    Object representing a node with left and right children
+    Object representing a node with left and right children.
     """
     def __init__(self, left=None, right=None):
         self.left = left
@@ -14,8 +17,7 @@ class Node(object):
 
 class PriorityQ(object):
     """
-    Object containing our priority queue with methods deletemin and
-    insert that cost O(logn)
+    Object containing our priority queue with methods deletemin and insert. 
     """
     def __init__(self, mylist=[]):
         self.list = mylist
@@ -113,7 +115,7 @@ def decodeString(enc_message, codebook):
     : param codebook: <HashObject> Contains the codebook where each key is a
                       letter and each value corresponds to the letter's huffman
                       encoding.
-    : return: <str> The decoding of the encoded string. 
+    : return: <str> The decoding of the encoded string.
     """
     chunk = ''
     dec_message = ''
@@ -163,19 +165,35 @@ def huffmanEncode(lc):
     return codebook
 
 if __name__ == "__main__":
-    # read in our data file consisting of Frost poem
-    with open('data.txt', 'r') as myfile:
-        data=myfile.read().replace('\n', ' ').lower()
 
-    codebook = huffmanEncode(string2freq(data))
-    encoded_string = encodeString(data, codebook)
-    decoded_string = decodeString(encoded_string, codebook)
+    argparser = argparse.ArgumentParser(prog="./huffman.py")
+    argparser.add_argument("-d", "--decode", action="store_true",
+                           help="Decrypt a file", default=False)
+    argparser.add_argument("file_path", metavar="file_path", 
+                           help="Path to file to encrypt/decrypt", 
+                           type=str) 
+    args = argparser.parse_args()
 
-    print('\nOriginal message:\n{}\n'.format(data))
-    print('Codebook: \n{}\n\nEncoded string:\n{}\n'.format(codebook, encoded_string))
-    print('Length of encoded string:\n{}\n'.format(len(encoded_string)))
-    print('Decoded string:\n{}\n'.format(decoded_string))
+    if (args.decode):
+        with open("key", "rb") as infile:
+            codebook = pickle.load(infile)
+            os.remove("key")
+        with open(args.file_path, "r") as infile:
+            data = str(infile.read())
+            os.remove(args.file_path)
+        decoded_string = decodeString(data, codebook)
+        with open("decoded_message", "w") as outfile:
+            outfile.write(decoded_string)
 
+    else:
+        with open(args.file_path, 'r') as myfile:
+            data=myfile.read().replace('\n', ' ').lower()
+        codebook = huffmanEncode(string2freq(data))
+        encoded_string = encodeString(data, codebook)
+        with open('encoded_message', 'w') as outfile:
+            outfile.write(encoded_string)
+        with open('key', 'wb') as outfile:
+            pickle.dump(codebook, outfile)
 
 
 

@@ -1,6 +1,7 @@
 #!/usr/local/bin/python3
 import unittest
 import huffman
+import argparse
 
 class huffman_ut(unittest.TestCase):
 

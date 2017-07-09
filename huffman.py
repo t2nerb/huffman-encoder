@@ -5,6 +5,8 @@ import argparse
 import pickle
 import os
 
+verbose = 0     # Debugging
+
 class Node(object):
     """
     Object representing a node with left and right children.
@@ -29,11 +31,11 @@ class PriorityQ(object):
         for i in range(self.length):
             if item[0] <= self.list[i][0]:
                 self.list.insert(i, item)
-                if (args.verbose): print('inserted: ', item, ' at index', i)
+                if (verbose): print('inserted: ', item, ' at index', i)
                 self.length += 1
                 return
         self.list.append(item)
-        if (args.verbose): print('appended: ', item, ' at index ', len(self.list)-1)
+        if (verbose): print('appended: ', item, ' at index ', len(self.list)-1)
         self.length += 1
 
     def deletemin(self):
@@ -117,6 +119,7 @@ def decodeString(enc_message, codebook):
             if chunk == value:
                 dec_message += key
                 chunk = ''
+                break
     return dec_message
 
 def huffmanEncode(lc):
@@ -152,7 +155,6 @@ def huffmanEncode(lc):
 
 if __name__ == "__main__":
 
-    global args
     argparser = argparse.ArgumentParser(prog="./huffman.py")
     argparser.add_argument("-d", "--decode", action="store_true",
                            help="Decrypt a file", default=False)
@@ -163,6 +165,7 @@ if __name__ == "__main__":
                            help="Print debugging statements", default=False)
     args = argparser.parse_args()
 
+    if (args.verbose): verbose = 1
     if (args.decode):
         with open("key", "rb") as infile:
             codebook = pickle.load(infile)
